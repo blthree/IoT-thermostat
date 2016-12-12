@@ -38,7 +38,7 @@ class Arduino():
         command = (''.join(('RV', str(variable_number)))).encode()
         self.conn.write(command)
         line_received = self.conn.readline().decode().strip()
-        print('The line is', line_received)
+        #  print('The line is', line_received) for debugging
         header, value = line_received.split(':')  # e.g. D13:1
         if header == ('V' + str(variable_number)):
             # If header matches
