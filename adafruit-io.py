@@ -39,7 +39,10 @@ def flipstate(cs):
     elif cs == 'OFF':
         cs = 'ON'
     return cs
-
+# function to turn on thermostat, pass the serial cxn and state
+'''def updateRelayState(ard, cs):
+    if
+    a.digital_write(relayPin, 1)'''
 
 # function to decide if thermostat should be on/off
 # currently uses a simple 6-degree window around the set temp
@@ -98,5 +101,11 @@ for x in range(0, 300):
         # print(thermologic(80, latestTemp, 60, thermostate))
         thermostate = thermologic(70, latestTemp, 60, thermostate)
         print(thermostate)
+        if thermostate == 'ON':
+            a.digital_write(relayPin, 1)
+        elif thermostate == 'OFF':
+            a.digital_read(relayPin, 0)
+        else:
+            a.digital_write(relayPin, 0)
     time.sleep(1)
 
