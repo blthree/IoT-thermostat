@@ -9,7 +9,7 @@ db = TinyDB('db.json')
 
 # function to check feeds and add to db
 # list of feeds to check
-tempfeeds = ['BedroomTemp', 'LivingroomTemp']
+tempfeeds = ['BedroomTemp']
 
 
 def checkFeeds(feedlist):
