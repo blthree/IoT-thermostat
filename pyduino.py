@@ -63,9 +63,12 @@ class Arduino():
         Internally sends b'WD{pin_number}:{digital_value}' over the serial
         connection
         """
-        command = (''.join(('WD', str(pin_number), ':',
-                            str(digital_value)))).encode()
-        self.conn.write(command)
+        try:
+            command = (''.join(('WD', str(pin_number), ':',
+                                str(digital_value)))).encode()
+            self.conn.write(command)
+        except AttributeError:
+            print("digital write failed!")
 
 
     def analog_read(self, pin_number):

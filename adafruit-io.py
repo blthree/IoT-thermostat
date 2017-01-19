@@ -1,10 +1,9 @@
 # Import library and create instance of REST client.
-import time
 
 from Adafruit_IO import Client
 from tinydb import TinyDB
 
-from pyduino import *
+from arduinohandler import *
 
 db = TinyDB('db.json')
 
@@ -12,8 +11,9 @@ db = TinyDB('db.json')
 # list of feeds to check
 tempfeeds = ['BedroomTemp', 'LivingroomTemp']
 
-def checkFeeds():
-    for fd in tempfeeds:
+
+def checkFeeds(feedlist):
+    for fd in feedlist:
         recordTemp = aio.receive(fd)
         recordDate = recordTemp.created_at.split('T')[:-1][0]
         recordTime = recordTemp.created_at.split('T')[1].split('.')[0][:-3]
@@ -62,50 +62,32 @@ def thermologic(target, bt, lt, cs):
 # start adafruit IO client
 aio = Client('14737421b335461c9a194995f9b537af')
 
-a = Arduino()
-# if your arduino was running on a serial port other than '/dev/ttyACM0/'
-# declare: a = Arduino(serial_port='/dev/ttyXXXX')
-
-time.sleep(3)
-# sleep to ensure ample time for computer to make serial connection
+a = connect_to_arduino('COM3')
 
 statusPin = 12
 relayPin = 4
-a.set_pin_mode(statusPin, 'O')
-time.sleep(.5)  # need to let the arduino catch up
-# initialize the digital pins as IO
 
-time.sleep(1)
-# allow time to make connection
+# allow time to catch up
 
 # flash LED to show startup
-for j in range(0, 6):
-    if j % 2 == 0:
-        a.digital_write(statusPin, 1)
-    else:
-        a.digital_write(statusPin, 0)
-    time.sleep(.25)
-for j in range(0, 6):
-    if j % 2 == 0:
-        a.digital_write(relayPin, 1)
-    else:
-        a.digital_write(relayPin, 0)
-    time.sleep(.25)
+acknowledge(a, statusPin)
+acknowledge(a, relayPin)
+
 ######################################
 thermostate = 'OFF'
 for x in range(0, 300):
     # check every 5 seconds
     if x % 5 == 0:
-        latestTemp = checkFeeds()
+        latestTemp = checkFeeds(tempfeeds)
         # print(latestTemp)
         # print(thermologic(80, latestTemp, 60, thermostate))
         thermostate = thermologic(70, latestTemp, 60, thermostate)
         print(thermostate)
         if thermostate == 'ON':
-            a.digital_write(relayPin, 1)
+            digital_write_handler(a, relayPin, 1)
         elif thermostate == 'OFF':
-            a.digital_read(relayPin, 0)
+            digital_write_handler(a, relayPin, 0)
         else:
-            a.digital_write(relayPin, 0)
+            digital_write_handler(a, relayPin, 0)
     time.sleep(1)
 
