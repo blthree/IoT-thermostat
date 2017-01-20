@@ -75,7 +75,7 @@ acknowledge(a, relayPin)
 
 ######################################
 thermostate = 'OFF'
-for x in range(0, 300):
+for x in range(0, 36000):
     # check every 5 seconds
     if x % 5 == 0:
         latestTemp = checkFeeds(tempfeeds)
