@@ -68,7 +68,7 @@ def getSetTemp():
 # start adafruit IO client
 aio = Client('14737421b335461c9a194995f9b537af')
 
-a = connect_to_arduino()
+a = connect_to_arduino('/dev/ttyUSB0')
 
 statusPin = 12
 relayPin = 4
