@@ -84,18 +84,18 @@ SetTemp = getSetTemp()
 
 ######################################
 thermostate = 'OFF'
-for x in range(0, 36000):
-    # check every 5 seconds
-    if x % 5 == 0:
-        latestTemp = checkFeeds(tempfeeds)
-        thermostate = thermologic(getSetTemp(), latestTemp, thermostate)
-        print(thermostate)
-        if thermostate == 'ON':
-            digital_write_handler(a, relayPin, 1)
-        elif thermostate == 'OFF':
-            digital_write_handler(a, relayPin, 0)
-        else:
-            digital_write_handler(a, relayPin, 0)
-        aio.send('onoff', thermostate)
-    time.sleep(1)
-
+while True:
+    for x in range(0, 60):
+        # check every 5 seconds
+        if x % 5 == 0:
+            latestTemp = checkFeeds(tempfeeds)
+            thermostate = thermologic(getSetTemp(), latestTemp, thermostate)
+            print(thermostate)
+            if thermostate == 'ON':
+                digital_write_handler(a, relayPin, 1)
+            elif thermostate == 'OFF':
+                digital_write_handler(a, relayPin, 0)
+            else:
+                digital_write_handler(a, relayPin, 0)
+            aio.send('onoff', thermostate)
+        time.sleep(1)
