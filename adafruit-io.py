@@ -39,17 +39,13 @@ def flipstate(cs):
     elif cs == 'OFF':
         cs = 'ON'
     return cs
-# function to turn on thermostat, pass the serial cxn and state
-'''def updateRelayState(ard, cs):
-    if
-    a.digital_write(relayPin, 1)'''
 
 # function to decide if thermostat should be on/off
 # currently uses a simple 6-degree window around the set temp
 # returns a state, either on or off
-def thermologic(target, bt, lt, cs):
-    assert target > 60
-    assert target < 90
+def thermologic(target, bt, cs):
+    # assert target > 60
+    # assert target < 90
     if bt >= target + 3:
         return 'OFF'
     elif bt <= target - 3:
@@ -57,6 +53,16 @@ def thermologic(target, bt, lt, cs):
     else:
         return cs
 
+
+def getSetTemp():
+    setpoint = int(aio.receive('SetTemp').value)
+    if setpoint not in range(60, 90):
+        print('SetTemp is out of range: ' + str(setpoint) + ' allowable range is 60-90F')
+        print('Resetting at 70F!')
+        setpoint = 70
+        aio.send('SetTemp', setpoint)
+    print("temp is set at: " + str(setpoint))
+    return setpoint
 
 #################################################
 # start adafruit IO client
@@ -72,6 +78,8 @@ relayPin = 4
 # flash LED to show startup
 acknowledge(a, statusPin)
 acknowledge(a, relayPin)
+# get starting SetTemp
+SetTemp = getSetTemp()
 
 ######################################
 thermostate = 'OFF'
@@ -79,9 +87,7 @@ for x in range(0, 36000):
     # check every 5 seconds
     if x % 5 == 0:
         latestTemp = checkFeeds(tempfeeds)
-        # print(latestTemp)
-        # print(thermologic(80, latestTemp, 60, thermostate))
-        thermostate = thermologic(70, latestTemp, 60, thermostate)
+        thermostate = thermologic(getSetTemp(), latestTemp, thermostate)
         print(thermostate)
         if thermostate == 'ON':
             digital_write_handler(a, relayPin, 1)
@@ -89,5 +95,6 @@ for x in range(0, 36000):
             digital_write_handler(a, relayPin, 0)
         else:
             digital_write_handler(a, relayPin, 0)
+        aio.send('onoff', thermostate)
     time.sleep(1)
 
