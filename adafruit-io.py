@@ -44,11 +44,11 @@ def flipstate(cs):
 # currently uses a simple 6-degree window around the set temp
 # returns a state, either on or off
 def thermologic(target, bt, cs):
-    # assert target > 60
-    # assert target < 90
-    if bt >= target + 3:
+    assert target >= 60
+    assert target <= 90
+    if bt >= target + 2:
         return 'OFF'
-    elif bt <= target - 3:
+    elif bt <= target - 2:
         return 'ON'
     else:
         return cs
@@ -72,8 +72,8 @@ a = connect_to_arduino('/dev/ttyUSB0')
 
 statusPin = 12
 relayPin = 4
-start_output_pin(a, 12)
-start_output_pin(a, 4)
+start_output_pin(a, relayPin)
+start_output_pin(a, statusPin)
 # allow time to catch up
 
 # flash LED to show startup
@@ -84,18 +84,19 @@ SetTemp = getSetTemp()
 
 ######################################
 thermostate = 'OFF'
-for x in range(0, 36000):
-    # check every 5 seconds
-    if x % 5 == 0:
-        latestTemp = checkFeeds(tempfeeds)
-        thermostate = thermologic(getSetTemp(), latestTemp, thermostate)
-        print(thermostate)
-        if thermostate == 'ON':
-            digital_write_handler(a, relayPin, 1)
-        elif thermostate == 'OFF':
-            digital_write_handler(a, relayPin, 0)
-        else:
-            digital_write_handler(a, relayPin, 0)
-        aio.send('onoff', thermostate)
-    time.sleep(1)
-
+while True:
+    for x in range(0, 60):
+        # check every 5 seconds
+        if x % 5 == 0:
+            latestTemp = checkFeeds(tempfeeds)
+            thermostate = thermologic(getSetTemp(), latestTemp, thermostate)
+            print(thermostate)
+            # apparently relay is on when pulled low
+            if thermostate == 'OFF':
+                digital_write_handler(a, relayPin, 1)
+            elif thermostate == 'ON':
+                digital_write_handler(a, relayPin, 0)
+            else:
+                digital_write_handler(a, relayPin, 1)
+            aio.send('onoff', thermostate)
+        time.sleep(1)
