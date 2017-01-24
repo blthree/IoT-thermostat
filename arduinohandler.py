@@ -46,9 +46,9 @@ def start_output_pin(a, pin):
         a.set_pin_mode(pin, 'O')
         time.sleep(1)
     except AttributeError:
-        print("Failed to set pin" + pin + "as an output pin")
+        print("Failed to set pin" + str(pin) + "as an output pin")
     else:
-        print("Successfully set pin" + pin + "as an output pin")
+        print("Successfully set pin" + str(pin) + "as an output pin")
 
 
 def digital_write_handler(a, pin, value):
