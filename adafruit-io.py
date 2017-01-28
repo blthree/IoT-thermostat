@@ -1,6 +1,6 @@
 # Import library and create instance of REST client.
 
-from Adafruit_IO import Client
+import Adafruit_IO
 from tinydb import TinyDB
 
 from arduinohandler import *
@@ -55,7 +55,11 @@ def thermologic(target, bt, cs):
 
 
 def getSetTemp():
-    setpoint = int(aio.receive('SetTemp').value)
+    try:
+        setpoint = int(aio.receive('SetTemp').value)
+    except Adafruit_IO.RequestError:
+        print('Request Error!')
+
     if setpoint not in range(60, 90):
         print('SetTemp is out of range: ' + str(setpoint) + ' allowable range is 60-90F')
         print('Resetting at 70F!')
@@ -66,7 +70,7 @@ def getSetTemp():
 
 #################################################
 # start adafruit IO client
-aio = Client('14737421b335461c9a194995f9b537af')
+aio = Adafruit_IO.Client('14737421b335461c9a194995f9b537af')
 
 a = connect_to_arduino('/dev/ttyUSB0')
 
