@@ -17,8 +17,8 @@ def checkFeeds(feedlist):
         recordTemp = aio.receive(fd)
         recordDate = recordTemp.created_at.split('T')[:-1][0]
         recordTime = recordTemp.created_at.split('T')[1].split('.')[0][:-3]
-        feedRecord = {'Location': fd, 'Temperature': recordTemp.value, 'Date': recordDate,
-                      'Time': recordTime}
+        recordDateTime = recordDate + '.' + recordTime
+        feedRecord = {recordDateTime: {'Location': fd, 'Temperature': recordTemp.value}}
         db.insert(feedRecord)
         # print('Received value: {0}'.format(recordTemp.value))
 
