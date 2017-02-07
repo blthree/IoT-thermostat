@@ -1,6 +1,9 @@
 # Import library and create instance of REST client.
 
+import datetime
+
 import Adafruit_IO
+from dateutil import tz
 from tinydb import TinyDB
 
 from arduinohandler import *
@@ -11,14 +14,25 @@ db = TinyDB('db.json')
 # list of feeds to check
 tempfeeds = ['BedroomTemp']
 
+'''take in date and time as strings and spit out a localized datetime string'''
+
+
+def makeDateObj(d, t):
+    from_zone = tz.tzutc()
+    to_zone = tz.tzlocal()
+    fmt = '%Y-%m-%d %H:%M'
+    recdt = d + ' ' + t
+    dt = datetime.datetime.strptime(recdt, fmt)
+    dt = dt.replace(tzinfo=from_zone)
+    dt = dt.astimezone(to_zone)
+    return dt.strftime(fmt)
 
 def checkFeeds(feedlist):
     for fd in feedlist:
         recordTemp = aio.receive(fd)
         recordDate = recordTemp.created_at.split('T')[:-1][0]
         recordTime = recordTemp.created_at.split('T')[1].split('.')[0][:-3]
-        feedRecord = {'Location': fd, 'Temperature': recordTemp.value, 'Date': recordDate,
-                      'Time': recordTime}
+        feedRecord = {str(makeDateObj(recordDate, recordTime)): {'Location': fd, 'Temperature': recordTemp.value}}
         db.insert(feedRecord)
         # print('Received value: {0}'.format(recordTemp.value))
 
@@ -26,9 +40,7 @@ def checkFeeds(feedlist):
             bedroomTemp = recordTemp.value
             print(bedroomTemp)
 
-    # SetTemp = aio.receive('SetTemp')
 
-    # print(db.all())
     return int(bedroomTemp)
 
 

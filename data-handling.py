@@ -18,13 +18,12 @@ for record in c.values():
 # 2017-01-15 has 196 elements
 times = []
 temps = []
-for record in db_array['2017-01-15']:
+for record in db_array['2017-02-04']:
     no_colon = record['Time'].replace(':', '')
     times.append(int(no_colon))
     temps.append(int(record['Temperature']))
-times.sort()
-temps.sort()
 print(len(times))
 print(len(temps))
 pyplt.plot(times, temps, 'ro')
+pyplt.axis([800, 810, 60, 72])
 pyplt.show()
