@@ -14,8 +14,11 @@ statusPin = 12
 relayPin = 4
 # list of feeds to check
 tempfeeds = ['BedroomTemp']
-
-
+# get adafruit IO key from config file
+config_file = open('config', 'r')
+aio_key = config_file.readline().strip('\n')
+config_file.close()
+print(aio_key)
 class arduinoExtra(Arduino):
     def acknowledge(self, pin):
         # flash LED 3 times to acknowledge something
@@ -74,11 +77,12 @@ class simulatedArduino():
 
 '''call this on startup, starts database, adafruit IO REST client, and connects to arduino'''
 def initialize():
-    # start adafruit IO client
+    # start tinydb, adafruit client and arduino connection
     db = TinyDB('db.json')
-    aio = Adafruit_IO.Client('14737421b335461c9a194995f9b537af')
+    aio = Adafruit_IO.Client(aio_key)
     try:
         a = arduinoExtra('COM6')
+    # just make a fake arduino object
     except serial.serialutil.SerialException:
         print("Arduino connection failed!")
         print("Simulating Arduino Connection Instead!")
