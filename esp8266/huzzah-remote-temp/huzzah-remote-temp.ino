@@ -1,30 +1,19 @@
 /***************************************************
+  Adafruit IO code is from:
   Adafruit MQTT Library ESP8266 Example
-
-  Must use ESP8266 Arduino from:
-    https://github.com/esp8266/Arduino
-
-  Works great with Adafruit's Huzzah ESP board & Feather
-  ----> https://www.adafruit.com/product/2471
-  ----> https://www.adafruit.com/products/2821
-
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
 
   Written by Tony DiCola for Adafruit Industries.
   MIT license, all text above must be included in any redistribution
+
+
  ****************************************************/
   #include <OneWire.h>
 #include <DallasTemperature.h>
 
-// Data wire is plugged into port 2 on the Arduino
+// Data wire is plugged into port 5 on the esp
 #define ONE_WIRE_BUS 5
 
-// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
-
-// Pass our oneWire reference to Dallas Temperature. 
 DallasTemperature sensors(&oneWire);
 
 #include <ESP8266WiFi.h>
@@ -33,17 +22,18 @@ DallasTemperature sensors(&oneWire);
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID       "Check your knot"
-#define WLAN_PASS       "7thheaven"
+#define WLAN_SSID       "YOUR WIFI SSID"
+#define WLAN_PASS       "YOUR WIFI PASSWORD"
 
 /************************* Adafruit.io Setup *********************************/
 
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883                   // use 8883 for SSL
-#define AIO_USERNAME    "blthree"
-#define AIO_KEY         "14737421b335461c9a194995f9b537af"
+#define AIO_USERNAME    "PUT USERNAME HERE"
+#define AIO_KEY         "PUT AIO KEY HERE"
 
 /*************************LED SETUP*******************************************/
+//currently not used, although it is hooked up
 #define LEDpin  13
 int currentTemp;
 /************ Global State (you don't need to change this!) ******************/
@@ -58,8 +48,6 @@ Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO
 
 /****************************** Feeds ***************************************/
 
-// Setup a feed called 'photocell' for publishing.
-// Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
 Adafruit_MQTT_Publish bedroomtemp = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/BedroomTemp");
 // Setup a feed called 'onoff' for subscribing to changes.
 Adafruit_MQTT_Subscribe onoffbutton = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/onoff");
@@ -78,6 +66,8 @@ void setup() {
 
   Serial.println(F("Adafruit MQTT demo"));
   pinMode(LEDpin, OUTPUT);
+
+
   digitalWrite(LEDpin, LOW);
   delay(500);
   digitalWrite(LEDpin, HIGH);

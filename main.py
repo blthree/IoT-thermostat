@@ -1,4 +1,5 @@
-# Import library and create instance of REST client.
+# config file should contain AIO key and the name
+# of the serial port for the arduino on the first two lines
 
 import datetime
 from time import sleep
@@ -17,6 +18,7 @@ tempfeeds = ['BedroomTemp']
 # get adafruit IO key from config file
 config_file = open('config', 'r')
 aio_key = config_file.readline().strip('\n')
+com_port = config_file.readline().strip('\n')
 config_file.close()
 print(aio_key)
 class arduinoExtra(Arduino):
@@ -81,7 +83,7 @@ def initialize():
     db = TinyDB('db.json')
     aio = Adafruit_IO.Client(aio_key)
     try:
-        a = arduinoExtra('COM6')
+        a = arduinoExtra(com_port)
     # just make a fake arduino object
     except serial.serialutil.SerialException:
         print("Arduino connection failed!")
