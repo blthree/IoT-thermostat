@@ -114,16 +114,22 @@ def make_date_object(d, t):
 # TODO: make this generic for checking and parsing the settemp feed as well
 def check_feeds(feedlist):
     for fd in feedlist:
-        recordTemp = aio.receive(fd)
-        recordDate = recordTemp.created_at.split('T')[:-1][0]
-        recordTime = recordTemp.created_at.split('T')[1].split('.')[0][:-3]
-        feedRecord = {str(make_date_object(recordDate, recordTime)): {'Location': fd, 'Temperature': recordTemp.value}}
-        db.insert(feedRecord)
-        # print('Received value: {0}'.format(recordTemp.value))
+        try:
+            recordTemp = aio.receive(fd)
+        except Adafruit_IO.RequestError:
+            print('Request Error!, while updating temp')
+            sleep(2) # take a break before next loop
+            return 65
+        else:
+            recordDate = recordTemp.created_at.split('T')[:-1][0]
+            recordTime = recordTemp.created_at.split('T')[1].split('.')[0][:-4]
+            feedRecord = {str(make_date_object(recordDate, recordTime)): {'Location': fd, 'Temperature': recordTemp.value}}
+            db.insert(feedRecord)
+            # print('Received value: {0}'.format(recordTemp.value))
 
-        if fd == 'BedroomTemp':
-            bedroomTemp = recordTemp.value
-            print(bedroomTemp)
+            if fd == 'BedroomTemp':
+                bedroomTemp = recordTemp.value
+                print(bedroomTemp)
     return int(bedroomTemp)
 
 
@@ -161,7 +167,8 @@ def getSetTemp():
     try:
         setpoint = int(aio.receive('SetTemp').value)
     except Adafruit_IO.RequestError:
-        print('Request Error!')
+        print('Request Error while getting setTemp')
+        setpoint = 65
 
     if setpoint not in range(60, 90):
         print('SetTemp is out of range: ' + str(setpoint) + ' allowable range is 60-90F')
@@ -175,6 +182,7 @@ def getSetTemp():
 '''main program loop'''
 db, aio, a = initialize()
 thermostate = 'OFF'
+sleep(1)
 SetTemp = getSetTemp()
 while True:
     for x in range(0, 60):
@@ -184,5 +192,8 @@ while True:
             thermostate = thermologic(getSetTemp(), latestTemp, thermostate)
             print(thermostate)
             flipstate(thermostate)
-            aio.send('onoff', thermostate)
+            try:
+                aio.send('onoff', thermostate)
+            except Adafruit_IO.RequestError:
+                print('Request error sending on/off')
         sleep(1)

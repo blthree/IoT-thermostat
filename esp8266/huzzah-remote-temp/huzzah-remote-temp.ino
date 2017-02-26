@@ -11,7 +11,7 @@
 #include <DallasTemperature.h>
 
 // Data wire is plugged into port 5 on the esp
-#define ONE_WIRE_BUS 5
+#define ONE_WIRE_BUS 4
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
@@ -22,15 +22,15 @@ DallasTemperature sensors(&oneWire);
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID       "YOUR WIFI SSID"
-#define WLAN_PASS       "YOUR WIFI PASSWORD"
+#define WLAN_SSID       "Check your knot"
+#define WLAN_PASS       "7thheaven"
 
 /************************* Adafruit.io Setup *********************************/
 
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883                   // use 8883 for SSL
-#define AIO_USERNAME    "PUT USERNAME HERE"
-#define AIO_KEY         "PUT AIO KEY HERE"
+#define AIO_USERNAME    "blthree"
+#define AIO_KEY         "72ba127bbe6a4279a2827eb880ab7011"
 
 /*************************LED SETUP*******************************************/
 //currently not used, although it is hooked up
